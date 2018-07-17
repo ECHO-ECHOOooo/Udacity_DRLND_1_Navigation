@@ -13,7 +13,7 @@ The state space has 37 dimensions that includes the agent's velocity and ray-bas
 - **2** - turn left.
 - **3** - turn right.
 
-The task consisted of a series of episodes (the number of which was a hyper-parameter) , and in order to solve the environment, my agent was required to achieve an average score of +13 or better over 100 consecutive episodes.  The current (final?) implementation achieved a score of 15.46 after executing 5,000 episodes of interacting with the environment.
+The task consisted of a series of episodes (the number of which was a hyper-parameter) , and in order to solve the environment, my agent was required to achieve an average score of +13 or better over 100 consecutive episodes.  The final implementation achieved a score of 15.46 after executing 5,000 episodes of interacting with the environment.
 
 ### Setting Up the Environment
 
