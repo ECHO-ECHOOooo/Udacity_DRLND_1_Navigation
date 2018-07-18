@@ -17,8 +17,8 @@ BATCH_SIZE = 64         # minibatch size
 GAMMA = 0.99             # discount factor
 ##GAMMA = 0.98            # discount factor
 TAU = 1e-3              # for soft update of target parameters
-#LR = 5e-4               # learning rate 
-LR = 5e-3               # learning rate 
+#LR= 5e-4               # learning rate 
+LR = 1e-3               # learning rate 
 UPDATE_EVERY = 4        # how often to update the network
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -41,11 +41,13 @@ class Agent():
 
         # Q-Network
         self.qnetwork_local = QNetwork(state_size, action_size, seed, 
-                                       fc1_units=64, fc2_units=128, 
-                                       fc3_units=64).to(device)
+                                       fc1_units=64, fc2_units=64, 
+                                       fc3_units=32).to(device)
+        
         self.qnetwork_target = QNetwork(state_size, action_size, seed, 
-                                        fc1_units=64, fc2_units=128, 
-                                        fc3_units=64 ).to(device)
+                                        fc1_units=64, fc2_units=64, 
+                                        fc3_units=32 ).to(device)
+        
         self.optimizer = optim.Adam(self.qnetwork_local.parameters(), lr=LR)
 
         # Replay memory
@@ -53,6 +55,9 @@ class Agent():
         # Initialize time step (for updating every UPDATE_EVERY steps)
         self.t_step = 0
     
+    def update_optimizer(self, learning_rate):        
+        self.optimizer = optim.Adam(self.qnetwork_local.parameters(), lr=learning_rate)
+        
     def step(self, state, action, reward, next_state, done):
         # Save experience in replay memory
         self.memory.add(state, action, reward, next_state, done)
@@ -127,6 +132,14 @@ class Agent():
             target_param.data.copy_(tau*local_param.data + (1.0-tau)*target_param.data)
 
 
+    def save(self, to_filename):
+        """Save the local qnetwork model so it can later be restored if needed."""
+        self.qnetwork_local.save(to_filename)
+        
+    def restore(self, from_filename):
+        """Restore the local qnetwork model from it's previously-stored file."""
+        self.qnetwork_local.restore(from_filename)
+        
 class ReplayBuffer:
     """Fixed-size buffer to store experience tuples."""
 
@@ -162,7 +175,7 @@ class ReplayBuffer:
         dones = torch.from_numpy(np.vstack([e.done for e in experiences if e is not None]).astype(np.uint8)).float().to(device)
   
         return (states, actions, rewards, next_states, dones)
-
+        
     def __len__(self):
         """Return the current size of internal memory."""
         return len(self.memory)

@@ -21,9 +21,9 @@ class QNetwork(nn.Module):
         super(QNetwork, self).__init__()
         self.seed = torch.manual_seed(seed)
         self.fc1 = nn.Linear(state_size, fc1_units)
-        self.fc2 = nn.Linear(fc1_units, fc2_units)
-        self.fc3 = nn.Linear(fc2_units, fc3_units)
-        self.fc4 = nn.Linear(fc3_units, action_size)
+        self.fc2 = nn.Linear(fc1_units,  fc2_units)
+        self.fc3 = nn.Linear(fc2_units,  fc3_units)
+        self.fc4 = nn.Linear(fc3_units,  action_size)
 
     def forward(self, state):
         """Build a network that maps state -> action values."""
@@ -31,3 +31,12 @@ class QNetwork(nn.Module):
         x = F.relu(self.fc2(x))
         x = F.relu(self.fc3(x))
         return self.fc4(x)
+    
+    def save(self, to_filename):
+        """Save the current model weights and biases so it can later be re-loaded."""
+        torch.save(self.state_dict(), to_filename)
+        
+    def restore(self, from_filename):
+        """Restore the model from a file to which it was previously saved"""
+        self.load_state_dict(torch.load(from_filename))
+        
